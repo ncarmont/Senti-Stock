@@ -1,8 +1,16 @@
-from flask import Flask, redirect, url_for
-from flask import render_template
-from flask import request
+
+import os                       
+import json                       
+import datetime                       
+
+from flask import Flask, redirect, url_for,render_template,request
+from bson import ObjectId
+from pymongo import MongoClient
 
 app = Flask(__name__)
+# client = MongoClient("mongodb://127.0.0.1:27017") #host uri
+# db = client.mymongodb #Select the database
+# # mongo = PyMongo(app)
 
 @app.route("/")
 def home():
