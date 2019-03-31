@@ -16,8 +16,8 @@
 		var b ={{ varx|tojson|safe }};
 		var colors = [];
 		for (var i=0 ;i<b.length;i++){
-			if (a[i]<0){
-				colors[i]='rgba(204,204,204,1)';
+			if (a[i]>=0){
+				colors[i]='rgba(0,255,0,0.5)';
 			}else{
 				colors[i]='rgba(222,45,38,0.8)';
 			}
@@ -32,15 +32,11 @@
   	}}];
 
 
-      var c= {{ varz|tojson|safe }};
+        var c= {{ varz|tojson|safe }};
 		var d ={{ varw|tojson|safe }};
 		var colors = [];
 		for (var i=0 ;i<b.length;i++){
-			if (a[i]<0){
-				colors[i]='rgba(204,204,204,1)';
-			}else{
-				colors[i]='rgba(222,45,38,0.8)';
-			}
+			colors[i]='rgba(0,255,0,0.5)';
 		}
 
     var data2= [{

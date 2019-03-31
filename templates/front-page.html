@@ -1,0 +1,257 @@
+<html>
+<head>
+
+  <title>SentiStock</title>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+  <!-- jQuery library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+  <!-- Latest compiled JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css?family=Sree+Krushnadevaraya" rel="stylesheet">
+<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script>
+    $(document).ready(function() {
+
+           //options( 1 - ON , 0 - OFF)
+           var auto_slide = 1;
+           var hover_pause = 2;
+           var key_slide = 1;
+
+           //speed of auto slide(
+           var auto_slide_seconds = 0;
+           /* IMPORTANT: i know the variable is called ...seconds but it's
+           in milliseconds ( multiplied with 1000) '*/
+
+           /*move the last list item before the first item. The purpose of this is
+           if the user clicks to slide left he will be able to see the last item.*/
+           $('#carousel_ul li:first').before($('#carousel_ul li:last'));
+
+           //check if auto sliding is enabled
+           if(auto_slide == 1){
+               /*set the interval (loop) to call function slide with option 'right'
+               and set the interval time to the variable we declared previously */
+               var timer = setInterval('slide("right")', auto_slide_seconds);
+
+               /*and change the value of our hidden field that hold info about
+               the interval, setting it to the number of milliseconds we declared previously*/
+               $('#hidden_auto_slide_seconds').val(auto_slide_seconds);
+           }
+
+           //check if hover pause is enabled
+           if(hover_pause == 1){
+               //when hovered over the list
+               $('#carousel_ul').hover(function(){
+                   //stop the interval
+                   clearInterval(timer)
+               },function(){
+                   //and when mouseout start it again
+                   timer = setInterval('slide("right")', auto_slide_seconds);
+               });
+
+           }
+
+           //check if key sliding is enabled
+           if(key_slide == 1){
+
+               //binding keypress function
+               $(document).bind('keypress', function(e) {
+                   //keyCode for left arrow is 37 and for right it's 39 '
+                   if(e.keyCode==37){
+                           //initialize the slide to left function
+                           slide('left');
+                   }else if(e.keyCode==39){
+                           //initialize the slide to right function
+                           slide('right');
+                   }
+               });
+
+           }
+
+     });
+
+   //FUNCTIONS BELLOW
+
+   //slide function
+   function slide(where){
+
+               //get the item width
+               var item_width = $('#carousel_ul li').outerWidth() + 10;
+
+               /* using a if statement and the where variable check
+               we will check where the user wants to slide (left or right)*/
+               if(where == 'left'){
+                   //...calculating the new left indent of the unordered list (ul) for left sliding
+                   var left_indent = parseInt($('#carousel_ul').css('left')) + item_width;
+               }else{
+                   //...calculating the new left indent of the unordered list (ul) for right sliding
+                   var left_indent = parseInt($('#carousel_ul').css('left')) - item_width;
+
+               }
+
+               //make the sliding effect using jQuery's animate function... '
+               $('#carousel_ul:not(:animated)').animate({'left' : left_indent},5000,function(){
+
+                   /* when the animation finishes use the if statement again, and make an ilussion
+                   of infinity by changing place of last or first item*/
+                   if(where == 'left'){
+                       //...and if it slided to left we put the last item before the first item
+                       $('#carousel_ul li:first').before($('#carousel_ul li:last'));
+                   }else{
+                       //...and if it slided to right we put the first item after the last item
+                       $('#carousel_ul li:last').after($('#carousel_ul li:first'));
+                   }
+
+                   //...and then just get back the default left indent
+                   $('#carousel_ul').css({'left' : '-610px'});
+               });
+
+   }
+  </script>
+
+
+  <style>
+
+    #carousel_inner {
+    float: left;
+    width: 600px;
+    overflow: hidden;
+    background: #0E4C92;
+}
+
+#carousel_ul li img {
+    width: 600px;
+    height: 350px;
+}
+
+#carousel_ul {
+    position: relative;
+    left: -610px;
+    list-style-type: none;
+    margin: 0px;
+    padding: 0px;
+    width: 9999px;
+    padding-bottom: 10px;
+}
+
+#carousel_ul li {
+    float: left;
+    width: 600px;
+    padding: 0px;
+    height: 350px;
+    background: #00BCD8;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+#carousel_ul li img {
+    margin-bottom: -4px;
+    cursor: pointer;
+    cursor: hand;
+    border: 0px;
+}
+
+#left_scroll, #right_scroll {
+    float: left;
+    height: 20px;
+    width: 600px;
+    margin-top: 50px;
+    margin-left: 20px;
+}
+
+#left_scroll img, #right_scroll img {
+    border: 0;
+ /* remove the default border of linked image */
+/*styling*/
+    cursor: pointer;
+    cursor: hand;
+}
+
+#left_scroll img {
+    width: 100px;
+    height: 25px;
+}
+
+#right_scroll img {
+    width: 100px;
+    height: 25px;
+}
+  /* Make the image fully responsive */
+  .carousel-inner img {
+    width: 100%;
+
+  }
+  </style>
+</head>
+
+<body>
+  <div style="width:100%; height:65px; background-color:#0E4C92; display:block;z-index: 10000;position:fixed; top: 0px;opacity:0.95;">
+    <div style="padding-top:0px;">
+      <p style="margin-top:0px;font-family: 'Sree Krushnadevaraya', serif; font-weight:500;height:100%; padding:0px 8px 00px 30px; color:white; font-size:38px;display:inline;">
+        SentiStock </p>
+      <i class="fas fa-chart-line fa-3x" style="color:white;"></i>
+    </div>
+
+
+  </div>
+<div style="width:100%; height:800%; background-color: #1E4C92 ">
+   <div style=" display:flex;justify-content: center; align-items:center;margin-top:20px;height:650px;; width:100%;background: linear-gradient( to bottom right, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 1.0) ), url('building.jpg') no-repeat;-webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;">
+
+<form method="POST" action="/plot">
+    <li>Company Name:<input type="text" name="company"></li>  
+    <li><input type="submit" value="Add"></li>      
+</form>
+
+   <!-- filter: blur(3px);-webkit-filter: blur(3px);"/> -->
+
+</div>
+    <div style=" width:100%; display: flex; justify-content: center; margin-top:20px;">
+    <div id='carousel_container' >
+        <div id='carousel_inner'>
+            <ul id='carousel_ul'>
+                <li>
+                    <a href='#'>
+                        <img src='/Users/computerscience/Desktop/LAHacks/tesla-stock.jpg'/>
+                    </a>
+                </li>
+                <li>
+                    <a href='#'>
+                        <img src='/Users/computerscience/Desktop/LAHacks/facebook-news.jpg'/>
+                    </a>
+                </li>
+                <li>
+                      <a href='#'>
+                          <img src='/Users/computerscience/Desktop/LAHacks/apple-news.jpg'/>
+                      </a>
+                  </li>
+                <li>
+                      <a href='#'>
+                          <img src='/Users/computerscience/Desktop/LAHacks/micro-news.jpg'/>
+                      </a>
+                  </li>
+                <li>
+                      <a href='#'>
+                          <img src='/Users/computerscience/Desktop/LAHacks/facebook-news.jpg'/>
+                      </a>
+                  </li>
+            </ul>
+        </div>
+    </div>
+</div>
+</body>
+
+
+</html>

@@ -261,7 +261,7 @@ def plot():
 
     
 
-    return render_template("landing.html")
+    return render_template("front-page.html")
 
 @app.route("/api/textmsg",methods=["GET", "POST"])
 def textmsg():
