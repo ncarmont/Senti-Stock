@@ -1,20 +1,41 @@
+<!DOCTYPE html>
 <html>
-  <body>
-    
-    <li>
-        {% for item in varx %}
-    {{ item }}
-    {%- endfor %}
+<head>
+       <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
 
-    </li>
 
-    <li>
-        {% for item in vary %}
-    {{ item }}
-    {%- endfor %}
+<body>
+<div id="graph"></div>
 
-    </li>
 
-    
-  </body>
+<script>
+	
+		var a= {{ vary|tojson|safe }};
+		var b ={{ varx|tojson|safe }};
+		var colors = [];
+		for (var i=0 ;i<b.length;i++){
+			if (a[i]<0){
+				colors[i]='rgba(204,204,204,1)';
+			}else{
+				colors[i]='rgba(222,45,38,0.8)';
+			}
+		}
+
+    var data= [{
+        y: a,
+        x: b,
+        type:'bar',
+        marker:{
+    	color: colors
+  	}}];
+
+
+
+
+Plotly.plot('graph',data);
+</script>
+
+
+</body>
 </html>
