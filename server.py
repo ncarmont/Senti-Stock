@@ -150,10 +150,33 @@ def savesentiment():
 
 
 
-@app.route("/api/plot",methods=["GET", "POST"])
+@app.route("/plot",methods=["GET", "POST"])
 def plot():
+    if request.form and request.method == 'POST':
+        dict1 = request.form.to_dict()
+        company = dict1["company"]
+        company_sentiment_collection = mongo.db.company_sentiment
+        cursor = company_sentiment_collection.find({"company_name": company})
+        
+        if cursor.count() == 0:
+            print("404 not found")
+            return render_template("404.html")
+
+        else:         
+
+            
+            listx=[]
+            listy=[]
+            for values_of_each_day in cursor:
+                listx.append(values_of_each_day["date"])
+                listy.append(values_of_each_day["score"])
+
+
+            return render_template("graphs.html" , varx = listx , vary = listy)
+
     
-    return render_template("home.html")
+
+    return render_template("landing.html")
 
 @app.route("/api/textmsg",methods=["GET", "POST"])
 def textmsg():
@@ -202,9 +225,8 @@ def analyze_saliance(text, keyword_search, client):
             break
     return saliance
 
-def analyze_sentiment(content):
 
-  
+def analyze_sentiment(content): 
 
     # content = 'Your text to analyze, e.g. Hello, world!'
 
