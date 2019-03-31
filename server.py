@@ -27,41 +27,57 @@ def predict():
         print(request.form)
         dict1 = request.form.to_dict()
         company = dict1["company"]
-        news_date = dict1["newsdate"]
+        news_date_from = dict1["newsdate_from"]
+        news_date_to = dict1["newsdate_to"]
 
         if "company_name"  not in mongo.db.list_collection_names():
             mongo.db.createCollection("company_name")
 
         company_name_collection = mongo.db.company_name
 
+        y,m,d = news_date_from.split('-')
+        dateDelt1 = datetime.datetime(int(y),int(m),int(d))
 
-        if company_name_collection.find_one({"date": news_date}) is None :
-
-            all_articles = request_articles_by_date(company,news_date)
-            
-            json_list = []
-            for i in range(0,5):
+        y,m,d = news_date_to.split('-')
+        dateDelt2 = datetime.datetime(int(y),int(m),int(d))
         
-                article = all_articles['articles'][i]
-                #Insert one article
-                source = article['source']['name']
-                title = article['title']
-                description = article['description']
-                # 'date': str(news_date), 'id': str(i) , 'source': source , 'title' : title , 'description' : description
+        while dateDelt1!=dateDelt2:
+            date_string = dateDelt1.strftime('%Y-%m-%d')
+            
+            if company_name_collection.find_one({"date": date_string}) is None :
+                
                
-                dict_json = {'source': source , 'title' : title , 'description' : description}
+                
+                all_articles = request_articles_by_date(company,date_string )
+                
+                
+                json_list = []
+                for i in range(0,5):
+            
+                    article = all_articles['articles'][i]
+                    #Insert one article
+                    source = article['source']['name']
+                    title = article['title']
+                    description = article['description']   
+                
+                    dict_json = {'source': source , 'title' : title , 'description' : description}
 
-                json_list.append(dict_json)
+                    json_list.append(dict_json)
 
 
-            print(json_list)
+               
 
-            company_name_collection.insert({'company_name': company, 'date': news_date , 'data': json_list })  
-            print("inserted news artciles for a day for one company") 
+                company_name_collection.insert({'company_name': company, 'date': date_string , 'data': json_list })  
+                print("inserted news artciles for a day for one company") 
 
-        else:
-            comp = company_name_collection.find_one({"company_name": company})
-            print(comp)
+            else:
+                comp = company_name_collection.find_one({"company_name": company})
+                print("in else")
+
+            
+            dateDelt1 += datetime.timedelta(days=1)
+
+        
         
 
 
@@ -78,12 +94,12 @@ def predict():
 
 
 
-def request_articles_by_date(keyword_search,date):
+def request_articles_by_date(keyword_search,date1):
     all_articles = newsapi.get_everything(q= keyword_search,
                                           #sources='bbc-news,the-verge',
                                           #domains='bbc.co.uk,techcrunch.com',
-                                          from_param= date,
-                                          to= date,
+                                          from_param= date1,
+                                          to= date1,
                                           language='en',
                                           sort_by='relevancy',
                                           page_size= 5  )  
@@ -100,40 +116,12 @@ def request_articles_by_date(keyword_search,date):
 
 @app.route("/api/plot",methods=["GET", "POST"])
 def plot():
-    if request.form and request.method == 'POST':
-        # redirect(url_for('page'))
-        print(request.form)
-        dict1 = request.form.to_dict()
-        company = dict1["company"]
-        
-        company_name_collection = mongo.db.company_name
-        if company_name_collection.find_one({"company_name": company}) is None:
-            company_name_collection.insert({'company_name':company})            
-            
-        else:
-            comp = company_name_collection.find_one({"company_name": company})
-            print(comp)
-        
-        return render_template("graphs.html", var = dict1)
+    
     return render_template("home.html")
 
 @app.route("/api/textmsg",methods=["GET", "POST"])
 def textmsg():
-    if request.form and request.method == 'POST':
-        # redirect(url_for('page'))
-        print(request.form)
-        dict1 = request.form.to_dict()
-        company = dict1["company"]
-        
-        company_name_collection = mongo.db.company_name
-        if company_name_collection.find_one({"company_name": company}) is None:
-            company_name_collection.insert({'company_name':company})            
-            
-        else:
-            comp = company_name_collection.find_one({"company_name": company})
-            print(comp)
-        
-        return render_template("graphs.html", var = dict1)
+    
     return render_template("home.html")
 
 
