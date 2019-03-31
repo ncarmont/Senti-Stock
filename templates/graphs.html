@@ -36,7 +36,11 @@
 		var d ={{ varw|tojson|safe }};
 		var colors = [];
 		for (var i=0 ;i<b.length;i++){
-			colors[i]='rgba(0,255,0,0.5)';
+			if (c[i]>=0){
+				colors[i]='rgba(0,255,0,0.5)';
+			}else{
+				colors[i]='rgba(222,45,38,0.8)';
+			}
 		}
 
     var data2= [{

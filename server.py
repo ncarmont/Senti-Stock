@@ -252,11 +252,17 @@ def plot():
             
             listw=[]
             listz=[]
+            counter =0 
+            temp = 0
             for values_of_each_day in cursor2:
+                
+                if counter ==0:
+                    temp = values_of_each_day["stock"]
+                    counter+=1
                 listw.append(values_of_each_day["date"])
-                listz.append(values_of_each_day["stock"])
-
-
+                listz.append(values_of_each_day["stock"]-temp)
+                temp = values_of_each_day["stock"]
+                
             return render_template("graphs.html" , varx = listx , vary = listy , varw =listw , varz = listz)
 
     
