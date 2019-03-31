@@ -7,18 +7,19 @@ import datetime
 import six
 import sys
 import time                 
-
+from datetime import timezone
 from flask import Flask, redirect, url_for,render_template,request
 from google.cloud import language
 from google.cloud.language import enums
 from google.cloud.language import types
 from flask_pymongo import PyMongo
 from newsapi import NewsApiClient
-
+import requests
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "C:\\Users\\kshit\\Downloads\\LAHacks2-085ebdbfd067.json"
 client = language.LanguageServiceClient()
 
+global_dict = { "apple" :"AAPL"}
 
 newsapi = NewsApiClient(api_key='8e9b0daaf3df4a789b34ca0773f9899e')
 
@@ -146,7 +147,71 @@ def savesentiment():
     return render_template("savesentiment.html")
 
 
+@app.route("/api/savestock",methods=["GET", "POST"])
+def savestock():
+    if request.form and request.method == 'POST':
+        dict1 = request.form.to_dict()
+        company = dict1["company"]
+        
+        response = requests.get('https://www.blackrock.com/tools/hackathon/performance?identifiers='+global_dict[company])
+        json_response = response.json()
+        temp = json_response["resultMap"]
+        tmp = temp['RETURNS']
+        test = tmp[0]
+        vals = test['performanceChart']  # contains performanceChart values
 
+
+        x = []
+        y = []
+
+        for i in range(len(vals)):
+            tmp = vals[i]
+            x.append(tmp[0])
+            y.append(tmp[1])
+
+
+        company_name_collection = mongo.db.company_name
+        cursor = company_name_collection.find({"company_name": company})
+        count = 0
+        for values_of_each_day in cursor:
+            if count == 0:
+                str1 = values_of_each_day["date"]
+            elif count == cursor.count() - 1:
+                str2 = values_of_each_day["date"]
+            count+=1
+        
+        res = imp_list(str1, str2 , x , y)
+
+
+        if "company_stock"  not in mongo.db.list_collection_names():
+            mongo.db.createCollection("company_stock")
+
+        company_stock_collection = mongo.db.company_stock
+
+
+        
+
+        counter = len(res)
+        print(str1)
+        y,m,d = str1.split('-')
+        dateDelt1 = datetime.datetime(int(y),int(m),int(d))
+        i = 0
+        while i<counter:
+            date_string = dateDelt1.strftime('%Y-%m-%d')
+
+            if company_stock_collection.find_one({"date": date_string}) is None : 
+                company_stock_collection.insert({'company_name': company, 'date': date_string , 'stock': res[i] })
+
+
+            dateDelt1 += datetime.timedelta(days=1)
+            i+=1
+
+
+
+        return render_template("predict.html", var = dict1)
+
+
+    return render_template("savestock.html")
 
 
 
@@ -156,9 +221,11 @@ def plot():
         dict1 = request.form.to_dict()
         company = dict1["company"]
         company_sentiment_collection = mongo.db.company_sentiment
-        cursor = company_sentiment_collection.find({"company_name": company})
+        company_stock_collection = mongo.db.company_stock
+
+        cursor1 = company_sentiment_collection.find({"company_name": company})
         
-        if cursor.count() == 0:
+        if cursor1.count() == 0:
             print("404 not found")
             return render_template("404.html")
 
@@ -167,12 +234,30 @@ def plot():
             
             listx=[]
             listy=[]
-            for values_of_each_day in cursor:
+            for values_of_each_day in cursor1:
                 listx.append(values_of_each_day["date"])
                 listy.append(values_of_each_day["score"])
 
 
-            return render_template("graphs.html" , varx = listx , vary = listy)
+
+
+        cursor2 = company_stock_collection.find({"company_name": company})
+        
+        if cursor2.count() == 0:
+            print("404 not found")
+            return render_template("404.html")
+
+        else:         
+
+            
+            listw=[]
+            listz=[]
+            for values_of_each_day in cursor2:
+                listw.append(values_of_each_day["date"])
+                listz.append(values_of_each_day["stock"])
+
+
+            return render_template("graphs.html" , varx = listx , vary = listy , varw =listw , varz = listz)
 
     
 
@@ -259,9 +344,29 @@ def request_articles_by_date(keyword_search,date1):
 
 
 
+def imp_list(str1, str2 , x , y):
+    int1 = conv2epoch(str1)
+    int2 = conv2epoch(str2)
+    for i in range(0,len(x)):
+        if x[i] == int1:
+            ind1 = i
+            break
 
+    for i in range(0,len(x)):
+        if x[i] == int2:
+            ind2 = i
+            return y[ind1:ind2]
 
+    return y[ind1:]
+    
 
+def conv2epoch(str):
+    year = int(str[0:4])
+    month = int(str[5:7])
+    day = int(str[8:])
+    dt = datetime.datetime(year, month, day)
+    milliseconds = int(round(dt.replace(tzinfo=timezone.utc).timestamp()) * 1000)
+    return milliseconds
 
 
 

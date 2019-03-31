@@ -6,7 +6,8 @@
 
 
 <body>
-<div id="graph"></div>
+<div id="graph1"></div>
+<div id="graph2"></div>
 
 
 <script>
@@ -22,7 +23,7 @@
 			}
 		}
 
-    var data= [{
+    var data1= [{
         y: a,
         x: b,
         type:'bar',
@@ -31,9 +32,30 @@
   	}}];
 
 
+      var c= {{ varz|tojson|safe }};
+		var d ={{ varw|tojson|safe }};
+		var colors = [];
+		for (var i=0 ;i<b.length;i++){
+			if (a[i]<0){
+				colors[i]='rgba(204,204,204,1)';
+			}else{
+				colors[i]='rgba(222,45,38,0.8)';
+			}
+		}
+
+    var data2= [{
+        y: c,
+        x: d,
+        type:'bar',
+        marker:{
+    	color: colors
+  	}}];
 
 
-Plotly.plot('graph',data);
+
+
+Plotly.plot('graph1',data1);
+Plotly.plot('graph2',data2);
 </script>
 
 
