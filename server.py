@@ -1,3 +1,7 @@
+###########################################
+# run server on LocalHost and port 8080
+######################################
+
 
 import argparse
 import os
@@ -16,15 +20,15 @@ from flask_pymongo import PyMongo
 from newsapi import NewsApiClient
 import requests
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "C:\\Users\\kshit\\Downloads\\LAHacks2-085ebdbfd067.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "your api json path + json filename here"
 client = language.LanguageServiceClient()
 
 global_dict = { "apple" :"AAPL"}
 
-newsapi = NewsApiClient(api_key='8e9b0daaf3df4a789b34ca0773f9899e')
+newsapi = NewsApiClient(api_key='your api key here')
 
 app = Flask(__name__)
-app.config["MONGO_URI"] = "mongodb://localhost:27017/mongotest"
+app.config["MONGO_URI"] = "mongodb://localhost:27017/mongotest" # use your own databasename
 mongo = PyMongo(app)
 
 @app.route("/")
